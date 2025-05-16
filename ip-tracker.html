@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>IP Tracker - Threat Origin Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Matrix Rain Background CSS -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      color: lime;
+      background: black;
+      overflow: hidden;
+    }
+
+    canvas#matrixRain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    #map {
+      height: 100vh;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .header {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: cyan;
+      font-size: 24px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px 15px;
+      border: 1px solid lime;
+      border-radius: 8px;
+      z-index: 2;
+    }
+  </style>
+
+  <!-- Leaflet & Plugins -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+
+<canvas id="matrixRain"></canvas>
+
+<div class="header">🌐 Real-Time IP Tracker</div>
+<div id="map"></div>
+
+<!-- JavaScript: Matrix Rain Effect -->
+<script>
+  const canvas = document.getElementById('matrixRain');
+  const ctx = canvas.getContext('2d');
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+
+  const chars = '01';
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = Array(Math.floor(columns)).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0F0';
+    ctx.font = fontSize + 'px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(drawMatrix, 35);
+</script>
+
+<!-- JavaScript: Map & Threat Data -->
+<script>
+  const map = L.map('map').setView([20, 0], 2);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  // Real-world mock data (replace this with API fetch for live data)
+  const threatPoints = [
+    {
+      ip: '198.51.100.14',
+      lat: 37.7749,
+      lng: -122.4194,
+      location: 'San Francisco, USA',
+      time: new Date().toLocaleString()
+    },
+    {
+      ip: '203.0.113.76',
+      lat: 28.6139,
+      lng: 77.2090,
+      location: 'Delhi, India',
+      time: new Date().toLocaleString()
+    },
+    {
+      ip: '192.0.2.24',
+      lat: 55.7558,
+      lng: 37.6173,
+      location: 'Moscow, Russia',
+      time: new Date().toLocaleString()
+    }
+  ];
+
+  // Add threat markers
+  threatPoints.forEach(threat => {
+    const marker = L.circleMarker([threat.lat, threat.lng], {
+      color: 'red',
+      radius: 10,
+      fillColor: 'lime',
+      fillOpacity: 0.5
+    }).addTo(map);
+
+    marker.bindPopup(`
+      <strong>🚨 Threat Detected</strong><br>
+      <b>IP:</b> ${threat.ip}<br>
+      <b>Location:</b> ${threat.location}<br>
+      <b>Time:</b> ${threat.time}
+    `);
+  });
+</script>
+
+</body>
+</html>
