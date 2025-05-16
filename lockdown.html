@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Lockdown</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', monospace;
+      color: #0f0;
+      background: black;
+      overflow-x: hidden;
+    }
+
+    /* Matrix background */
+    canvas#matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .container {
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: red;
+      text-shadow: 0 0 5px red;
+      animation: glitch 2s infinite;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 2px red; }
+      50% { text-shadow: -2px -2px lime; }
+      100% { text-shadow: 2px 2px red; }
+    }
+
+    .alert-box {
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid red;
+      padding: 20px;
+      margin: 30px auto;
+      width: 80%;
+      max-width: 600px;
+      font-size: 1.2em;
+      box-shadow: 0 0 20px red;
+    }
+
+    .lockdown-button {
+      background: red;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1.5em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px red;
+      transition: all 0.3s ease;
+    }
+    .lockdown-button:hover {
+      background: darkred;
+      box-shadow: 0 0 30px red;
+    }
+
+    .shield {
+      margin-top: 50px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .notification-log {
+      margin-top: 40px;
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      width: 80%;
+      color: lime;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      border: 1px solid #0f0;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <h1>🔴 SYSTEM BREACH DETECTED</h1>
+
+    <div class="alert-box" id="intrusion-info">
+      Intrusion detected from IP: <span id="ip">192.168.88.45</span><br>
+      Location: <span id="location">Unknown</span><br>
+      Timestamp: <span id="timestamp"></span><br>
+      Status: Threat Level HIGH ⚠️
+    </div>
+
+    <button class="lockdown-button" onclick="triggerLockdown()">🔒 LOCK SYSTEM</button>
+
+    <img class="shield" src="https://cdn-icons-png.flaticon.com/512/535/535285.png" width="120">
+
+    <div class="notification-log" id="log">
+      <strong>🔔 Past Events:</strong><br>
+      • [2025-05-15 16:04] - IP: 192.168.1.20 - BLOCKED<br>
+      • [2025-05-15 15:30] - IP: 198.51.100.7 - ATTEMPTED ACCESS<br>
+    </div>
+  </div>
+
+  <script>
+    // Matrix rain effect
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = '01';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0F0';
+      ctx.font = fontSize + 'px monospace';
+
+      drops.forEach((y, i) => {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        const x = i * fontSize;
+        ctx.fillText(text, x, y * fontSize);
+        drops[i] = y * fontSize > canvas.height || Math.random() > 0.95 ? 0 : y + 1;
+      });
+    }
+    setInterval(drawMatrix, 50);
+
+    // Real-time timestamp
+    function updateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      const timestamp = `${now.toLocaleDateString(undefined, options)} ${now.toLocaleTimeString()}`;
+      document.getElementById('timestamp').innerText = timestamp;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Lockdown trigger logic
+    function triggerLockdown() {
+      alert("🔒 System Locked Down! Access denied to intruder.");
+      document.body.innerHTML = `
+        <div class='container'>
+          <h1 style="color: lime;">✅ SYSTEM SECURED</h1>
+          <p>Unauthorized access has been neutralized.</p>
+          <img src="https://cdn-icons-png.flaticon.com/512/1792/1792864.png" width="100" />
+        </div>`;
+    }
+  </script>
+</body>
+</html>

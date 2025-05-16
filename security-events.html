@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recent Security Events</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      color: #00FF00;
+      background: black;
+      overflow-y: auto;  /* Changed from hidden to auto to allow vertical scroll */
+    }
+
+    /* Matrix Rain Effect */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .content {
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #0f0;
+      text-align: center;
+      text-shadow: 0 0 10px #0f0;
+    }
+
+    .log-box {
+      background-color: rgba(0, 0, 0, 0.8);
+      border: 2px solid #0f0;
+      padding: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+      box-shadow: 0 0 20px #0f0;
+    }
+
+    .log-entry {
+      margin-bottom: 15px;
+      border-bottom: 1px dashed #0f0;
+      padding-bottom: 5px;
+    }
+
+    .cyber-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: lime;
+      text-shadow: 0 0 8px lime;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+
+<div class="content">
+  <h1>🛡️ Real-Time Security Events</h1>
+  <div class="log-box" id="logBox">
+    <!-- Logs will be inserted here -->
+  </div>
+  <div class="cyber-footer">
+    Monitoring unauthorized access attempts in real-time. Stay Secure ⚔️
+  </div>
+</div>
+
+<script>
+  // Matrix background
+  const canvas = document.getElementById('matrixCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+  let letters = '01'.split('');
+  let fontSize = 14;
+  let columns = canvas.width / fontSize;
+  let drops = Array(Math.floor(columns)).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0F0';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      let text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+  setInterval(drawMatrix, 50);
+
+  // Real-time security log generator
+  const logBox = document.getElementById("logBox");
+
+  function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/mobile/i.test(ua)) return "Mobile Device";
+    if (/tablet/i.test(ua)) return "Tablet";
+    return "Desktop System";
+  }
+
+  function getBrowser() {
+    const ua = navigator.userAgent;
+    if (ua.includes("Chrome")) return "Chrome";
+    if (ua.includes("Firefox")) return "Firefox";
+    if (ua.includes("Safari")) return "Safari";
+    return "Other";
+  }
+
+  async function fetchIP() {
+    try {
+      const res = await fetch('https://api.ipify.org?format=json');
+      const data = await res.json();
+      return data.ip;
+    } catch (e) {
+      return "Unavailable";
+    }
+  }
+
+  async function addLogEntry() {
+    const ip = await fetchIP();
+    const now = new Date();
+    const time = now.toLocaleTimeString();
+    const date = now.toDateString();
+    const device = getDeviceType();
+    const browser = getBrowser();
+
+    const logHTML = `
+      <div class="log-entry">
+        <strong>🔐 Login Detected:</strong><br/>
+        <b>Time:</b> ${time}<br/>
+        <b>Date:</b> ${date}<br/>
+        <b>IP Address:</b> ${ip}<br/>
+        <b>Device:</b> ${device}<br/>
+        <b>Browser:</b> ${browser}
+      </div>
+    `;
+    logBox.innerHTML = logHTML + logBox.innerHTML;
+  }
+
+  // Add a new log every 5 seconds
+  setInterval(addLogEntry, 5000);
+  addLogEntry(); // Initial log
+</script>
+
+</body>
+</html>
